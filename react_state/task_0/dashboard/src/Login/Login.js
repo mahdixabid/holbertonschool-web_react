@@ -1,56 +1,55 @@
 import React from 'react';
-import './Login.css';
 import { StyleSheet, css } from 'aphrodite';
 
 function Login() {
   return (
-    <body className={App_body.Appbody}>
+    <main role='main' className={css(styles.login)}>
       <p>Login to access the full dashboard</p>
-      <div className="login">
-        <label htmlFor="username"  className={css(App_body.label_style)}>
-          Email:
-          <input></input>
-        </label>
-        <label htmlFor="password"  className={css(App_body.label_style)}>
-          Password:
-          <input></input>
-        </label>
-        <button className={App_body.AppBodyButton}>Ok</button>
-      </div>  
-    </body>
+      <label htmlFor='email'>Email:</label>
+      <input className={css(styles.inp)} type='email' name='email' id='email' />
+      <label htmlFor='password'>Password:</label>
+      <input
+        className={css(styles.inp)}
+        type='password'
+        name='password'
+        id='password'
+      />
+      <button className={css(styles.btn)} type='button'>
+        OK
+      </button>
+    </main>
   );
 }
 
-const App_body = css({
-  Appbody: {
-    margintop: '30px',
-    marginleft: '30px',
-    '@media (max-width: 900px)': {
-      minHeight: 0,
-      margin: 0,
-    }
-  },
+const screenSize = {
+  small: '@media screen and (max-width: 900px)',
+};
+
+const styles = StyleSheet.create({
   login: {
-    textAlign: 'center',
-    height: '22px',
-    width: '30px',
-    '@media (max-width: 900px)': {
-      display: 'block'
+    padding: '16px 24px',
+    [screenSize.small]: {
+      width: '90%',
+      padding: 0,
     },
-    label_style: {
-      '@media (max-width: 900px)': {
-        display: 'block',
-    }
+  },
+  inp: {
+    margin: '4px',
+    [screenSize.small]: {
+      display: 'block',
+      border: 'none',
+      margin: 0,
     },
-    AppBodyButton: {
-      textAlign: 'center',
-      height: '22px',
-      width: '30px',
-      '@media (max-width: 900px)': {
-        display: 'block'
-      }
-  }
-}
-    ,
-  });
-export default Login;       
+  },
+  btn: {
+    margin: '4px',
+    cursor: 'pointer',
+    [screenSize.small]: {
+      width: '32px',
+      display: 'block',
+      margin: 0,
+    },
+  },
+});
+
+export default Login;

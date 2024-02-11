@@ -1,98 +1,128 @@
-import React from 'react';
-import './Login.css';
+import React, { Component } from 'react';
 import { StyleSheet, css } from 'aphrodite';
-import { render } from 'enzyme';
 
-class Login extends React.Component {
+class Login extends Component {
   constructor(props) {
     super(props);
-    this.state = {  email: '', password: '', enableSubmit: false };
+    this.state = {
+      email: '',
+      password: '',
+      enableSubmit: false,
+    };
     this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
     this.handleChangeEmail = this.handleChangeEmail.bind(this);
     this.handleChangePassword = this.handleChangePassword.bind(this);
   }
 
-
-  handleLoginSubmit(event) {
-    event.preventDefault();
-    this.props.logIn(this.state.email, this.state.password);
+  handleLoginSubmit(e) {
+    e.preventDefault();
+    const { email, password } = this.state;
+    this.props.logIn(email, password);
   }
 
-  handleChangeEmail(event) {
-    this.setState({email: event.target.value}, () => {
-      if (this.state.email !== '') {
-        this.setState({enableSubmit: true});
-      }
-    });
+  handleChangeEmail(e) {
+    const { value } = e.target;
+    const { password } = this.state;
+
+    if (value !== '' && password !== '') this.setState({ enableSubmit: true });
+    else this.setState({ enableSubmit: false });
+
+    this.setState({ email: e.target.value });
   }
 
-  handleChangePassword(event) {
-    this.setState({password: event.value}, () => {
-      if (this.state.password !== '') {
-        this.setState({enableSubmit: true});
-      }
-    });
+  handleChangePassword(e) {
+    const { value } = e.target;
+    const { email } = this.state;
+
+    if (email !== '' && value !== '') this.setState({ enableSubmit: true });
+    else this.setState({ enableSubmit: false });
+
+    this.setState({ password: e.target.value });
   }
- 
-  render(){
-  return (
-    <body className={App_body.Appbody}>
-      <p>Login to access the full dashboard</p>
-      <div className="login">
-        <label htmlFor="username"  className={css(App_body.label_style)}>
-          Email:
+
+  render() {
+    return (
+      <main role='main' className={css(styles.login)}>
+        <p>Login to access the full dashboard</p>
+        <form action='' onSubmit={this.handleLoginSubmit}>
+          <label htmlFor='email'>Email:</label>
           <input
-                type='text'
-                value={this.state.email}
-                onChange={this.handleChangeEmail}
-                ></input>
-        </label>
-        <label htmlFor="password"  className={css(App_body.label_style)}>
-          Password:
+            type='email'
+            id='email'
+            name='email'
+            className={css(styles.inp)}
+            value={this.state.email}
+            onChange={this.handleChangeEmail}
+          />
+          <label htmlFor='password'>Password:</label>
           <input
-                type='text'
-                value={this.state.password}
-                onChange={this.handleChangePassword}
-                ></input>
-        </label>
-        <input  type='submit' text='Submit' disabled={!this.state.enableSubmit} className={css(App_body.AppBodyButton)}></input>
-        <button className={App_body.AppBodyButton}>Ok</button>
-      </div>  
-    </body>
-  );
+            type='password'
+            id='password'
+            name='password'
+            className={css(styles.inp)}
+            value={this.state.password}
+            onChange={this.handleChangePassword}
+          />
+          <button
+            type='submit'
+            className={css(styles.btn)}
+            disabled={!this.state.enableSubmit}
+          >
+            OK
+          </button>
+        </form>
+      </main>
+    );
+  }
 }
-}
+/*
+<label htmlFor='email'>Email:</label>
+        <input
+          className={css(styles.inp)}
+          type='email'
+          name='email'
+          id='email'
+        />
+        <label htmlFor='password'>Password:</label>
+        <input
+          className={css(styles.inp)}
+          type='password'
+          name='password'
+          id='password'
+        />
+        <button className={css(styles.btn)} type='button'>
+          OK
+        </button>
+*/
+const screenSize = {
+  small: '@media screen and (max-width: 900px)',
+};
 
-const App_body = css({
-  Appbody: {
-    margintop: '30px',
-    marginleft: '30px',
-    '@media (max-width: 900px)': {
-      minHeight: 0,
-      margin: 0,
-    }
-  },
+const styles = StyleSheet.create({
   login: {
-    textAlign: 'center',
-    height: '22px',
-    width: '30px',
-    '@media (max-width: 900px)': {
-      display: 'block'
+    padding: '16px 24px',
+    [screenSize.small]: {
+      width: '90%',
+      padding: 0,
     },
-    label_style: {
-      '@media (max-width: 900px)': {
-        display: 'block',
-    }
+  },
+  inp: {
+    margin: '4px',
+    [screenSize.small]: {
+      display: 'block',
+      border: 'none',
+      margin: 0,
     },
-    AppBodyButton: {
-      textAlign: 'center',
-      height: '22px',
-      width: '30px',
-      '@media (max-width: 900px)': {
-        display: 'block'
-      }
-  }
-}
-    ,
-  });
-export default Login;       
+  },
+  btn: {
+    margin: '4px',
+    cursor: 'pointer',
+    [screenSize.small]: {
+      width: '32px',
+      display: 'block',
+      margin: 0,
+    },
+  },
+});
+
+export default Login;

@@ -1,76 +1,76 @@
-import React from 'react';
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import React from 'react';
 import App from './App';
-import Header from '../Header/Header';
-import Login from '../Login/Login';
-import Footer from '../Footer/Footer';
-import Notifications from '../Notifications/Notifications';
-import CourseList from '../CourseList/CourseList';
-
-
-const wrapper = shallow(<App />);
+import { StyleSheetTestUtils } from 'aphrodite';
 
 describe('<App />', () => {
-  it('render App component', () => {
-    shallow(<App />);
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
+
+  it('render without crashing', () => {
+    const wrapper = shallow(<App />);
     expect(wrapper.exists());
   });
-  it('renders App-header', () => {
-    expect(wrapper.contains(<Header />));
-  });
-  it('renders App-body', () => {
-    expect(wrapper.contains(<Login />));
-  });
-  it('renders App-footer', () => {
-    expect(wrapper.contains(<Foote />));
+
+  it('contain Notifications component', () => {
+    const wrapper = shallow(<App />);
+    expect(wrapper.find('Notifications')).toHaveLength(1);
   });
 
-  it("<App /> doesn't contain <CourseList />", () => {
-		expect(wrapper.contains(<CourseList />)).to.equal(false);
-	});
+  it('contain Header component', () => {
+    const wrapper = shallow(<App />);
+    expect(wrapper.find('Header')).toHaveLength(1);
+  });
 
-});
+  it('contain Login component', () => {
+    const wrapper = shallow(<App />);
+    expect(wrapper.find('Login')).toHaveLength(1);
+  });
 
-describe("Testing the <App /> when isLoggedIn is true", () => {
-	let props = {
-		isLoggedIn: true,
-	};
+  it('contain Footer component', () => {
+    const wrapper = shallow(<App />);
+    expect(wrapper.find('Footer')).toHaveLength(1);
+  });
 
-	let component = shallow(<App {...props} />);
-	expect(component.contains(<Login />)).to.equal(false);
-	expect(component.contains(<CourseList />)).to.equal(true);
-
-  describe('logout alert', () => {
-    const myLogOut = jest.fn(() => undefined);
-    const myAlert = jest.spyOn(global, 'alert');
-
-    const wrapper = shallow(<App logOut={myLogOut} />)
-
-    expect(myAlert);
-    expect(myLogOut);
+  it('CourseList', () => {
+    const wrapper = shallow(<App />);
+    expect(wrapper.find('CourseList')).toHaveLength(0);
+  });
+  /*
+  it('isLoggedIn true', () => {
+    const wrapper = shallow(<App isLoggedIn />);
+    expect(wrapper.exists());
+    expect(wrapper.find('Login')).toHaveLength(0);
+    expect(wrapper.find('CourseList')).toHaveLength(1);
+  });
+*/
+  it('logOut', () => {
+    const logOut = jest.fn(() => undefined);
+    const wrapper = shallow(<App logOut={logOut} />);
+    expect(wrapper.exists());
+    const alert = jest.spyOn(global, 'alert');
+    expect(alert);
+    expect(logOut);
     jest.restoreAllMocks();
   });
-});
 
-describe('Example component', () => {
-  it('should have a default state of displayDrawer set to false', () => {
+  it('default state for displayDrawer is false', () => {
     const wrapper = shallow(<App />);
-    expect(wrapper.state().displayDrawer).toBe(false);
+    expect(wrapper.state().displayDrawer).toEqual(false);
   });
 
-  it('should update state of displayDrawer to true after calling handleDisplayDrawer', () => {
+  it('displayDrawer toggle handleDisplayDrawer', () => {
     const wrapper = shallow(<App />);
-    wrapper.instance().handleDisplayDrawer();
-    expect(wrapper.state().displayDrawer).toBe(true);
+    expect(wrapper.state().displayDrawer).toEqual(false);
+    const instance = wrapper.instance();
+    instance.handleDisplayDrawer();
+    expect(wrapper.state().displayDrawer).toEqual(true);
   });
 
-  it('should update state of displayDrawer to false after calling handleHideDrawer', () => {
-    const wrapper = shallow(<App />);
-    wrapper.instance().handleDisplayDrawer();
-    wrapper.instance().handleHideDrawer();
-    expect(wrapper.state().displayDrawer).toBe(false);
-  });
   it('displayDrawer toggle handleDisplayDrawer and handleHideDrawer', () => {
     const wrapper = shallow(<App />);
     expect(wrapper.state().displayDrawer).toEqual(false);

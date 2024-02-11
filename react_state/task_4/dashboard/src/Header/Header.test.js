@@ -1,20 +1,28 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { expect } from 'chai';
 import Header from './Header';
-
-const wrapper = shallow(<Header />);
+import { StyleSheetTestUtils } from 'aphrodite';
+import { user, logOut, AppContext } from '../App/AppContext';
 
 describe('<Header />', () => {
-  it('render Shell', () => {
-    shallow(<Header />);
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
+  /*
+  it('render without crashing', () => {
+    const wrapper = shallow(<Header />);
     expect(wrapper.exists());
   });
-  it('renders App-header', () => {
-    const image = wrapper.find('img');
-    const h1 = wrapper.find('h1');
-
-    expect(image.exists());
-    expect(h1.exists());
+*/
+  it('Header renders without crashing', () => {
+    const wrapper = shallow(
+      <AppContext.Provider value={{ user, logOut }}>
+        <Header />
+      </AppContext.Provider>
+    );
+    expect(wrapper.exists()).toEqual(true);
   });
 });

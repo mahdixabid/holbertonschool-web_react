@@ -1,32 +1,48 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { expect } from 'chai';
 import Login from './Login';
+import { StyleSheetTestUtils } from 'aphrodite';
 
-const wrapper = shallow(<Login/>);
+describe('<Login />', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
 
-describe(<Login/>, ()=>
-{
-    it('renders login div', ()=>{
-        shallow(<Login/>);
-        expect(wrapper.exists());
+  const wrapper = shallow(<Login />);
+
+  it('render without crashing', () => {
+    expect(wrapper.exists());
+  });
+
+  it('labels', () => {
+    expect(wrapper.find('form label')).toHaveLength(2);
+  });
+
+  it('inputs', () => {
+    expect(wrapper.find('form input')).toHaveLength(2);
+  });
+
+  it('button', () => {
+    const button = wrapper.find("form button[type='submit']");
+    expect(button).toHaveLength(1);
+    expect(button.prop('disabled')).toEqual(true);
+  });
+
+  it('form working', () => {
+    const email = wrapper.find('#email');
+    const password = wrapper.find('#password');
+    email.simulate('change', {
+      target: { name: 'email', value: 'account@domain.ext' },
     });
-    it('renders 2 input and 2 label', ()=>{
-     expect(wrapper.find('input').length).toEqual(2);
-     expect(wrapper.find('label').length).toEqual(2);
+    let submit = wrapper.find("form button[type='submit']");
+    expect(submit.prop('disabled')).toEqual(true);
+    password.simulate('change', {
+      target: { name: 'password', value: 'qwerty' },
     });
-    it('form working', () => {
-        const email = wrapper.find('#email');
-        const password = wrapper.find('#password');
-        email.simulate('change', {
-          target: { name: 'email', value: 'something@domain.com' },
-        });
-        let submit = wrapper.find("form button[type='submit']");
-        expect(submit.prop('disabled')).toEqual(true);
-        password.simulate('change', {
-          target: { name: 'password', value: 'password' },
-        });
-        submit = wrapper.find("form button[type='submit']");
-        expect(submit.prop('disabled')).toEqual(false);
-      });
-}); 
+    submit = wrapper.find("form button[type='submit']");
+    expect(submit.prop('disabled')).toEqual(false);
+  });
+});

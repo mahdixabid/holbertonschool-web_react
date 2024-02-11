@@ -1,197 +1,213 @@
+import React from 'react';
 import { shallow } from 'enzyme';
 import Notifications from './Notifications';
-import NotificationItem from './NotificationItem';
+import { getLatestNotification } from '../utils/utils';
+import { StyleSheetTestUtils } from 'aphrodite';
 
-const wrapper = shallow(<Notifications/>);
+describe('<Notification />', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
 
-describe('Test Notification.js', () => {
-  it('Notification without crashing', (done) => {
+  it('render without crashing', () => {
+    const wrapper = shallow(<Notifications />);
     expect(wrapper.exists());
-    done();
   });
 
-  it('renders the close button', (done) => {
-    expect(wrapper.find('img')).to.have.lengthOf(1);
-    done();
-  });
-  it('renders a list with three items', () => {
-    const listItems = wrapper.find(NotificationItem);
-    expect(listItems).to.have.lengthOf(3);
-  });
-
-  it('renders the text "Here is the list of notifications"', (done) => {
-    expect(wrapper.contains(<body className='App-body' />))
-    done();
-  });
-  it("menu item is being displayed when displayDrawer is false", () => {
-    const wrapper = shallow(<Notifications />);
-    wrapper.update();
-    const item = wrapper.find("div.menuItem");
-    expect(item).toHaveLength(1);
-  });
-  it("div.Notifications is not being displayed when displayDrawer is false", () => {
-    const wrapper = shallow(<Notifications />);
-    wrapper.update();
-    const item = wrapper.find("div.Notifications");
-    expect(item).toHaveLength(0);
-  });
-  it("menu item is being displayed when displayDrawer is true", () => {
+  it('Notification Item with html', () => {
     const wrapper = shallow(<Notifications displayDrawer />);
-    wrapper.update();
-    const item = wrapper.find("div.menuItem");
-    expect(item).toHaveLength(1);
+    const nItem = wrapper.find('NotificationItem');
+    expect(wrapper.exists());
+    expect(nItem.exists());
+    expect(nItem).toBeDefined();
   });
-  it("div.Notifications is being displayed when displayDrawer is true", () => {
+  it('Notification with displayDrawer false', () => {
+    const wrapper = shallow(<Notifications />);
+    const dNoti = wrapper.find('div.Notifications');
+    expect(wrapper.exists());
+    expect(dNoti.exists());
+    expect(dNoti).toHaveLength(0);
+  });
+});
+
+describe('listNotifications with values', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
+
+  let latestNotification = undefined;
+  let listNotifications = undefined;
+
+  beforeEach(() => {
+    latestNotification = getLatestNotification();
+    listNotifications = [
+      { id: 1, type: 'default', value: 'New course available' },
+      { id: 2, type: 'urgent', value: 'New resume available' },
+      { id: 3, type: 'urgent', html: { __html: latestNotification } },
+    ];
+  });
+
+  it('values', () => {
+    const wrapper = shallow(
+      <Notifications displayDrawer listNotifications={listNotifications} />
+    );
+    const nItem = wrapper.find('NotificationItem');
+    expect(wrapper.exists());
+    expect(nItem.exists());
+    expect(nItem).toBeDefined();
+    expect(nItem).toHaveLength(3);
+  });
+});
+
+describe('listNotifications without values', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
+
+  let listNotifications = undefined;
+  beforeEach(() => {
+    listNotifications = [];
+  });
+
+  it('empty', () => {
+    const wrapper = shallow(
+      <Notifications displayDrawer listNotifications={listNotifications} />
+    );
+    const nItem = wrapper.find('NotificationItem');
+    expect(wrapper.exists());
+    expect(nItem.exists());
+    expect(nItem).toHaveLength(1);
+  });
+
+  it('without listNotifications', () => {
     const wrapper = shallow(<Notifications displayDrawer />);
-    wrapper.update();
-    const item = wrapper.find("div.Notifications");
-    expect(item).toHaveLength(1);
+    const nItem = wrapper.find('NotificationItem');
+    expect(wrapper.exists());
+    expect(nItem.exists());
   });
-},
-  describe("Notifications with listNotifications", () => {
-    beforeEach(() => {
-      latestNotification = getLatestNotification();
-      listNotifications = [
-        { id: 1, type: "default", value: "New course available" },
-        { id: 2, type: "urgent", value: "New resume available" },
-        { id: 3, type: "urgent", html: { __html: latestNotification } },
-      ];
-    });},),
-    describe("Notifications without listNotifications or empty listNotifications", () => {
-      beforeEach(() => {
-        listNotifications = [];
-      });
-  
-      it("Notifications renders Notification Item correct with empty listNotifications", () => {
-        const wrapper = shallow(
-          <Notifications displayDrawer listNotifications={listNotifications} />
-        );
-        expect(wrapper.exists());
-        wrapper.update();
-        const listItems = wrapper.find("NotificationItem");
-        expect(listItems).toHaveLength(1);
-        expect(listItems.html()).toEqual(
-          '<li data-notification-type="default">No new notification for now</li>'
-        );
-      });
-      it("wmarkAsRead is being called with the right message", () => {
-        const wrapper = shallow(<Notifications displayDrawer />);
-  
-        console.log = jest.fn();
-  
-        const instance = wrapper.instance();
-  
-        const id = 5;
-  
-        instance.markAsRead(id);
-  
-        expect(console.log).toHaveBeenCalledWith(
-          `Notification ${id} has been marked as read`
-        );
-        jest.restoreAllMocks();
-      });
-    }),
-    it("does not rerender when updating the props of the component with the same list", () => {
-      const listNotifications = [
-        { id: 1, type: "default", value: "New course available" },
-        { id: 2, type: "urgent", value: "New resume available" },
-      ];
+});
 
-      const wrapper = shallow(
-        <Notifications displayDrawer listNotifications={listNotifications} />
-      );
+describe('markAsRead', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
 
-      const shouldComponentUpdate = jest.spyOn(
-        Notifications.prototype,
-        "shouldComponentUpdate"
-      );
+  it('console.log', () => {
+    const wrapper = shallow(<Notifications displayDrawer />);
+    expect(wrapper.exists());
+    console.log = jest.fn();
+    const instance = wrapper.instance();
+    const id = 0;
+    instance.markAsRead(id);
+    expect(console.log).toHaveBeenCalledWith(
+      `Notification ${id} has been marked as read`
+    );
+    jest.restoreAllMocks();
+  });
+});
 
-      wrapper.setProps({ listNotifications: listNotifications });
+describe('updating the props of the component', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
 
-      expect(shouldComponentUpdate).toHaveBeenCalled();
-      expect(shouldComponentUpdate).toHaveLastReturnedWith(false);
+  it('with the same list, the component doesn’t rerender', () => {
+    const listNotifications = [
+      { id: 1, type: 'default', value: 'New course available' },
+      { id: 2, type: 'urgent', value: 'New resume available' },
+    ];
+    const wrapper = shallow(
+      <Notifications displayDrawer listNotifications={listNotifications} />
+    );
+    const shouldComponentUpdate = jest.spyOn(
+      Notifications.prototype,
+      'shouldComponentUpdate'
+    );
+    expect(wrapper.exists());
+    wrapper.setProps({ listNotifications: listNotifications });
+    expect(shouldComponentUpdate).toHaveBeenCalled();
+    expect(shouldComponentUpdate).toHaveLastReturnedWith(false);
+    jest.restoreAllMocks();
+  });
 
-      jest.restoreAllMocks();
-    }));
+  it('with a longer list, the component does rerender', () => {
+    const listNotifications = [
+      { id: 1, type: 'default', value: 'New course available' },
+      { id: 2, type: 'urgent', value: 'New resume available' },
+    ];
+    let latestNotification;
+    const listNotifications2 = [
+      { id: 1, type: 'default', value: 'New course available' },
+      { id: 2, type: 'urgent', value: 'New resume available' },
+      { id: 3, type: 'urgent', html: { __html: latestNotification } },
+    ];
+    console.log(listNotifications);
+    const wrapper = shallow(
+      <Notifications displayDrawer listNotifications={listNotifications} />
+    );
+    const shouldComponentUpdate = jest.spyOn(
+      Notifications.prototype,
+      'shouldComponentUpdate'
+    );
+    expect(wrapper.exists());
+    wrapper.setProps({ listNotifications: listNotifications2 });
+    expect(shouldComponentUpdate).toHaveBeenCalled();
+    expect(shouldComponentUpdate).toHaveLastReturnedWith(true);
+    jest.restoreAllMocks();
+  });
+});
 
-    it("does rerender when updating the props of the component with a longer list", () => {
-      let listNotifications = [
-        { id: 1, type: "default", value: "New course available" },
-        { id: 2, type: "urgent", value: "New resume available" },
-      ];
+describe('displayDrawer', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
 
-      const listNotifications2 = [
-        { id: 1, type: "default", value: "New course available" },
-        { id: 2, type: "urgent", value: "New resume available" },
-        { id: 3, type: "urgent", html: { __html: latestNotification } },
-      ];
+  it('clicking on the menu item calls handleDisplayDrawer', () => {
+    const handleDisplayDrawer = jest.fn();
+    const handleHideDrawer = jest.fn();
+    const wrapper = shallow(
+      <Notifications
+        handleDisplayDrawer={handleDisplayDrawer}
+        handleHideDrawer={handleHideDrawer}
+      />
+    );
+    wrapper.find('#menuItem').simulate('click');
+    expect(handleDisplayDrawer).toHaveBeenCalled();
+    expect(handleHideDrawer).not.toHaveBeenCalled();
+    jest.restoreAllMocks();
+  });
 
-      console.log(listNotifications);
-      const wrapper = shallow(
-        <Notifications displayDrawer listNotifications={listNotifications} />
-      );
-
-      const shouldComponentUpdate = jest.spyOn(
-        Notifications.prototype,
-        "shouldComponentUpdate"
-      );
-
-      wrapper.setProps({ listNotifications: listNotifications2 });
-
-      expect(shouldComponentUpdate).toHaveBeenCalled();
-      jest.restoreAllMocks();
-    });
-  
-    describe('Notifications component', () => {
-      it('should have a default state of displayDrawer set to false', () => {
-        const wrapper = shallow(<Notifications
-          displayDrawer
-          handleDisplayDrawer={handleDisplayDrawer}
-          handleHideDrawer={handleHideDrawer}
-         />);
-        expect(wrapper.state().displayDrawer).toBe(false);
-      });
-    
-      it('should update state of displayDrawer to true after clicking on the menu item', () => {
-        const wrapper = shallow(  <Notifications
-          displayDrawer
-          handleDisplayDrawer={handleDisplayDrawer}
-          handleHideDrawer={handleHideDrawer}
-        />);
-        wrapper.find('.menu-item').simulate('click');
-        expect(wrapper.state().displayDrawer).toBe(true);
-      });
-    
-      it('should call handleDisplayDrawer when clicking on the menu item', () => {
-        const handleDisplayDrawerSpy = jest.spyOn(Example.prototype, 'handleDisplayDrawer');
-        const wrapper = shallow(<Notifications
+  it('clicking on the button calls handleHideDrawer', () => {
+    const handleDisplayDrawer = jest.fn();
+    const handleHideDrawer = jest.fn();
+    const wrapper = shallow(
+      <Notifications
         displayDrawer
         handleDisplayDrawer={handleDisplayDrawer}
         handleHideDrawer={handleHideDrawer}
-        />);
-        wrapper.find('.menu-item').simulate('click');
-        expect(handleDisplayDrawerSpy).toHaveBeenCalled();
-      });
-    
-      it('should update state of displayDrawer to false after clicking on the button', () => {
-        const wrapper = shallow(  <Notifications
-          displayDrawer
-          handleDisplayDrawer={handleDisplayDrawer}
-          handleHideDrawer={handleHideDrawer}
-        />);
-        wrapper.find('.menu-item').simulate('click');
-        wrapper.find('.button').simulate('click');
-        expect(wrapper.state().displayDrawer).toBe(false);
-      });
-    
-      it('should call handleHideDrawer when clicking on the button', () => {
-        const handleHideDrawerSpy = jest.spyOn(Example.prototype, 'handleHideDrawer');
-        const wrapper = shallow(  <Notifications
-          displayDrawer
-          handleDisplayDrawer={handleDisplayDrawer}
-          handleHideDrawer={handleHideDrawer}
-        />);
-        wrapper.find('.menu-item').simulate('click');
-        wrapper.find('.button').simulate('click');
-        expect(handleHideDrawerSpy).toHaveBeenCalled();
-      })});
+      />
+    );
+    wrapper.find('#close').simulate('click');
+    expect(handleDisplayDrawer).not.toHaveBeenCalled();
+    expect(handleHideDrawer).toHaveBeenCalled();
+    jest.restoreAllMocks();
+  });
+});

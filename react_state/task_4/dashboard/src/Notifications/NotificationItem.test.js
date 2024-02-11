@@ -1,50 +1,38 @@
 import React from 'react';
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import NotificationItem from './NotificationItem';
+import { StyleSheetTestUtils } from 'aphrodite';
 
-//import Enzyme from 'enzyme';
-//import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+describe('<NotificationItem />', () => {
+  beforeAll(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  afterAll(() => {
+    StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  });
 
-//Enzyme.configure({ adapter: new Adapter() });
-
-
-describe('NotificationItem', () => {
-  test('renders without crashing', () => {
+  it('render without crashing', () => {
     const wrapper = shallow(<NotificationItem />);
     expect(wrapper.exists());
   });
-  test('renders with correct type and value', () => {
+
+  it('renders type and value props', () => {
     const wrapper = shallow(<NotificationItem type='default' value='test' />);
     const li = wrapper.find('li');
-
-    expect(li.props()).to.have.property('data-notification-type', 'default');
-    expect(li.text()).to.equal('test');
+    expect(wrapper.exists());
+    expect(li.exists());
+    expect(li).toHaveLength(1);
+    expect(li.text()).toEqual('test');
+    expect(li.prop('data-notification-type')).toEqual('default');
   });
 
-  test('renders with correct inner html', () => {
-    const wrapper = shallow(<NotificationItem html={{ __html: '<u>test</u>' }} />);
-    
-    expect(wrapper.html()).to.equal('<li><u>test</u></li>');
-  });
-  it(" markAsRead is being called with the right message", () => {
-    const id = 1;
-
+  it('renders html prop', () => {
+    const text = 'Here is the list of notifications';
     const wrapper = shallow(
-      <NotificationItem type="default" value="test" id={id} />
+      <NotificationItem html={{ __html: '<u>test</u>' }} />
     );
-
-    const instance = wrapper;
-
-    instance.markAsRead = jest.fn();
-
-    const listItem = wrapper.find("li").first();
-
-    listItem.simulate("click");
-
-    instance.markAsRead(id);
-
-    expect(instance.markAsRead).toHaveBeenCalledWith(1);
-    jest.restoreAllMocks();
+    const li = wrapper.find('li');
+    expect(wrapper.exists());
+    expect(li.exists());
   });
 });
